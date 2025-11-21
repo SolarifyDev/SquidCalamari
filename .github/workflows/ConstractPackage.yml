@@ -23,31 +23,26 @@ jobs:
       - name: Restore Dependencies
         run: |
           dotnet restore source/Calamari.sln \
-          --configfile ./NuGet.Config \
-          -p:RestoreIgnoreFailedSources=true \
-          -p:NoWarn=NU1603
+            --configfile ./NuGet.Config \
+            /p:NoWarn=NU1603
 
       # 只编译 Calamari 主项目（net6.0），并继续忽略 NU1603
       - name: Build Release (net6.0)
         run: |
-          dotnet build \
+          dotnet build source/Calamari/Calamari.csproj \
             --configuration Release \
-            --framework net6.0 \
             --no-restore \
-            -p:NoWarn=NU1603 \
-            source/Calamari/Calamari.csproj
+            /p:NoWarn=NU1603
 
       # 为 net6.0 打包 Calamari，同样忽略 NU1603
       - name: Pack Calamari NuGet Package (net6.0)
         run: |
-          dotnet pack \
+          dotnet pack source/Calamari/Calamari.csproj \
             --configuration Release \
-            --framework net6.0 \
-            --no-build \
             --output ./nupkg \
-            --include-symbols --include-source \
-            -p:NoWarn=NU1603 \
-            source/Calamari/Calamari.csproj
+            --include-symbols \
+            --include-source \
+            /p:NoWarn=NU1603
 
       - name: List Generated Packages
         run: |
