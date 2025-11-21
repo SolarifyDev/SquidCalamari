@@ -1,31 +1,81 @@
-name: Build and Publish Calamari NuGet Package
+name: Build Calamari NuGet Package
 
 on:
   push:
     tags:
-      - 'v*' # 只有推送类似 v1.0.0 的标签时才触发
+      - 'v*'
   workflow_dispatch:
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4 # 使用较新版本
-      with:
-        dotnet-version: '6.0.x' # 请根据 Calamari 项目要求调整 .NET 版本
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
 
-    - name: Restore Dependencies
-      run: dotnet restore
+      # 首先修改包名配置
+      - name: Update PackageId
+        run: |
+          # 备份原文件
+          cp source/Calamari/Calamari.csproj source/Calamari/Calamari.csproj.backup
+          # 使用sed命令修改PackageId
+          sed -i 's/<PackageId>SquidCalamari<\/PackageId>/<PackageId>SolarifyDev.SquidCalamari<\/PackageId>/' source/Calamari/Calamari.csproj
+          # 更新仓库URL
+          sed -i 's|<RepositoryUrl>https://github.com/OctopusDeploy/Calamari/</RepositoryUrl>|<RepositoryUrl>https://github.com/SolarifyDev/SquidCalamari</RepositoryUrl>|' source/Calamari/Calamari.csproj
+          # 显示修改后的配置确认
+          echo "修改后的PackageId配置:"
+          grep -n "PackageId" source/Calamari/Calamari.csproj
 
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
+      # 恢复依赖，显式使用仓库里的 NuGet.Config，并忽略 NU1603 警告
+      - name: Restore Dependencies
+        run: |
+          dotnet restore source/Calamari.sln \
+            --configfile ./NuGet.Config \
+            /p:NoWarn=NU1603
 
-    - name: Pack NuGet Package
-      run: dotnet pack --configuration Release --no-build --output ./nupkg
+      # 只编译 Calamari 主项目（net6.0），并继续忽略 NU1603
+      - name: Build Release (net6.0)
+        run: |
+          dotnet build source/Calamari/Calamari.csproj \
+            --configuration Release \
+            --no-restore \
+            /p:NoWarn=NU1603
 
-    - name: Publish to GitHub Packages
-      run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
+      # 为 net6.0 打包 Calamari，同样忽略 NU1603
+      - name: Pack Calamari NuGet Package (net6.0)
+        run: |
+          dotnet pack source/Calamari/Calamari.csproj \
+            --configuration Release \
+            --output ./nupkg \
+            --include-symbols \
+            --include-source \
+            /p:NoWarn=NU1603
+
+      - name: List Generated Packages
+        run: |
+          echo "Generated packages:"
+          ls -la ./nupkg/
+          echo "包文件详情:"
+          find ./nupkg -name "*.nupkg" -exec echo "文件: {}" \;
+
+      - name: Publish to GitHub Packages
+        run: |
+          # 添加调试信息
+          echo "GitHub Actor: ${{ github.actor }}"
+          echo "Repository Owner: ${{ github.repository_owner }}"
+          
+          # 方法1：直接推送（推荐）
+          echo "开始发布到 GitHub Packages..."
+          dotnet nuget push ./nupkg/*.nupkg \
+            --source "https://nuget.pkg.github.com/SolarifyDev/index.json" \
+            --api-key "${{ secrets.GITHUB_TOKEN }}" \
+            --skip-duplicate \
+            --verbosity detailed
+
+          echo "发布完成！"
