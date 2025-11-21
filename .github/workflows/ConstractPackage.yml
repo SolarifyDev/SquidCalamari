@@ -51,17 +51,8 @@ jobs:
 
       - name: Publish to GitHub Packages
         run: |
-          dotnet nuget add source \
-            --username "${{ github.actor }}" \
-            --password "${{ secrets.GITHUB_TOKEN }}" \
-            --store-password-in-clear-text \
-            --name github \
-            "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-
-          for package in ./nupkg/*.nupkg; do
-            echo "Publishing $package"
-            dotnet nuget push "$package" \
-              --api-key "${{ secrets.GITHUB_TOKEN }}" \
-              --source "github" \
-              --skip-duplicate
-          done
+          # 方法1：使用 GitHub Token 直接认证
+          dotnet nuget push ./nupkg/*.nupkg \
+            --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+            --api-key "${{ secrets.GITHUB_TOKEN }}" \
+            --skip-duplicate
