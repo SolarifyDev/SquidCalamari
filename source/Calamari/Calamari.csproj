@@ -4,18 +4,20 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>Calamari</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>Calamari</PackageId>
+    <!-- 修改这一行：添加组织名前缀 -->
+    <PackageId>SolarifyDev.SquidCalamari</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <PackageProjectUrl>https://github.com/OctopusDeploy/Calamari</PackageProjectUrl>
+    <!-- 也更新项目URL指向你的仓库 -->
+    <PackageProjectUrl>https://github.com/SolarifyDev/SquidCalamari</PackageProjectUrl>
     <PackageLicense>https://github.com/OctopusDeploy/Calamari/blob/main/LICENSE.txt</PackageLicense>
-    <Authors>Octopus Deploy</Authors>
-    <Copyright>Octopus Deploy Pty Ltd</Copyright>
+    <Authors>SolarifyDev</Authors>
     <PackageTags>tool</PackageTags>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/OctopusDeploy/Calamari/</RepositoryUrl>
+    <!-- 更新仓库URL指向你的仓库 -->
+    <RepositoryUrl>https://github.com/SolarifyDev/SquidCalamari</RepositoryUrl>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Description>Contains the command-line Calamari tool that is used by Tentacle to perform depoyment actions on machines.</Description>
-    <Product>Calamari</Product>
+    <Product>SquidCalamari</Product>
     <RuntimeIdentifiers>win-x64;linux-x64;osx-x64;linux-arm;linux-arm64</RuntimeIdentifiers>
     <ApplicationManifest>Calamari.exe.manifest</ApplicationManifest>
     <TargetFrameworks>net462;net6.0</TargetFrameworks>
