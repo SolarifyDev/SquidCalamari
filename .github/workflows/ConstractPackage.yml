@@ -19,7 +19,6 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
-      # 首先修改包名配置
       - name: Update PackageId
         run: |
           # 备份原文件
@@ -70,12 +69,11 @@ jobs:
           echo "GitHub Actor: ${{ github.actor }}"
           echo "Repository Owner: ${{ github.repository_owner }}"
           
-          # 方法1：直接推送（推荐）
+          # 直接推送
           echo "开始发布到 GitHub Packages..."
           dotnet nuget push ./nupkg/*.nupkg \
             --source "https://nuget.pkg.github.com/SolarifyDev/index.json" \
             --api-key "${{ secrets.GITHUB_TOKEN }}" \
-            --skip-duplicate \
-            --verbosity detailed
+            --skip-duplicate
 
           echo "发布完成！"
