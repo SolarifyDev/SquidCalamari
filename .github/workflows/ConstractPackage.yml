@@ -1,58 +1,30 @@
-name: Build Calamari NuGet Package
+name: Build and Publish Calamari NuGet Package
 
 on:
   push:
     tags:
-      - 'v*'
-  workflow_dispatch:
+      - 'v*' # 只有推送类似 v1.0.0 的标签时才触发
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '6.0.x'
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4 # 使用较新版本
+      with:
+        dotnet-version: '6.0.x' # 请根据 Calamari 项目要求调整 .NET 版本
 
-      # 恢复依赖，显式使用仓库里的 NuGet.Config，并忽略 NU1603 警告
-      - name: Restore Dependencies
-        run: |
-          dotnet restore source/Calamari.sln \
-            --configfile ./NuGet.Config \
-            /p:NoWarn=NU1603
+    - name: Restore Dependencies
+      run: dotnet restore
 
-      # 只编译 Calamari 主项目（net6.0），并继续忽略 NU1603
-      - name: Build Release (net6.0)
-        run: |
-          dotnet build source/Calamari/Calamari.csproj \
-            --configuration Release \
-            --no-restore \
-            /p:NoWarn=NU1603
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
 
-      # 为 net6.0 打包 Calamari，同样忽略 NU1603
-      - name: Pack Calamari NuGet Package (net6.0)
-        run: |
-          dotnet pack source/Calamari/Calamari.csproj \
-            --configuration Release \
-            --output ./nupkg \
-            --include-symbols \
-            --include-source \
-            /p:NoWarn=NU1603
+    - name: Pack NuGet Package
+      run: dotnet pack --configuration Release --no-build --output ./nupkg
 
-      - name: List Generated Packages
-        run: |
-          echo "Generated packages:"
-          ls -la ./nupkg/
-
-      - name: Publish to GitHub Packages
-        run: |
-          # 方法1：使用 GitHub Token 直接认证
-          dotnet nuget push ./nupkg/*.nupkg \
-            --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-            --api-key "${{ secrets.GITHUB_TOKEN }}" \
-            --skip-duplicate
+    - name: Publish to GitHub Packages
+      run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
