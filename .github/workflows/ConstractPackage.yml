@@ -43,7 +43,7 @@ jobs:
       - name: Build and Pack Calamari
         run: |
           chmod +x ./build.sh
-          ./build.sh --target PackBinaries --configuration Release
+          ./build.sh --target PackBinaries --configuration Release --sign-binaries false
 
       # 生成的包会在 artifacts 目录
       - name: List Generated Packages
