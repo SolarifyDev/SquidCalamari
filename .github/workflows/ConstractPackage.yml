@@ -38,8 +38,7 @@ jobs:
       - name: Restore Dependencies
         run: |
           dotnet restore source/Calamari.sln \
-            --configfile ./NuGet.Config \
-            --ignore-failed-sources
+            --configfile ./NuGet.Config
 
       # 只编译 Calamari 主项目，并限制为 net6.0
       - name: Build Release (net6.0)
