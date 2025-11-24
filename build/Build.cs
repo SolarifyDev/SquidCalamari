@@ -49,7 +49,8 @@ namespace Calamari.Build
         // up to 3-4 minutes to sign all the binaries as we build for many, many
         // different runtimes so disabling it locally means quicker turn around
         // when doing local development.
-        bool WillSignBinaries => !IsLocalBuild || SignBinaries;
+        // Fixed: Changed OR to AND so SignBinaries parameter actually works in CI
+        bool WillSignBinaries => !IsLocalBuild && SignBinaries;
 
         [Parameter]
         readonly bool AppendTimestamp;
