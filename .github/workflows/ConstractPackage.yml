@@ -39,7 +39,7 @@ jobs:
         run: |
           dotnet restore source/Calamari.sln \
             --configfile ./NuGet.Config \
-            -p:RestoreIgnoreFailedSources=true
+            --ignore-failed-sources
 
       # 只编译 Calamari 主项目，并限制为 net6.0
       - name: Build Release (net6.0)
