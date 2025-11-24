@@ -41,20 +41,19 @@ jobs:
             --configfile ./NuGet.Config
 
       # 只编译 Calamari 主项目，并限制为 net6.0
-      - name: Build Release (net6.0)
-        run: |
-          dotnet build source/Calamari/Calamari.csproj \
-            --configuration Release \
-            --framework net6.0 \
-            --no-restore \
-            -p:Version=${{ env.PKG_VERSION }}
+#      - name: Build Release (net6.0)
+#        run: |
+#          dotnet build source/Calamari/Calamari.csproj \
+#            --configuration Release \
+#            --framework net6.0 \
+#            --no-restore \
+#            -p:Version=${{ env.PKG_VERSION }}
 
       # 按 tag 中的版本号打包 Calamari（覆盖项目中的版本）
       - name: Pack Calamari NuGet Package (net6.0)
         run: |
           dotnet pack source/Calamari/Calamari.csproj \
             --configuration Release \
-            --no-build \
             --output ./nupkg \
             --include-symbols \
             --include-source \
