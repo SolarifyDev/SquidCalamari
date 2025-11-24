@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Clean workspace before build
+        run: |
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/hostedtoolcache
+          sudo rm -rf ~/.nuget/packages
+
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
